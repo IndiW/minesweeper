@@ -41,4 +41,9 @@ def grid(request, grid_id):
         grid = get_grid(grid_id)
         return JsonResponse(grid)
 
+    elif request.method == 'DELETE':
+        obj = get_object_or_404(Grid, id=grid_id)
+        obj.delete()
+        return JsonResponse({'message': 'Grid deleted successfully'}, status=204)
+
     return HttpResponseBadRequest('Invalid Request')

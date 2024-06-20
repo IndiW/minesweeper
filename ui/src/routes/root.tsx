@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -10,6 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Env } from "@/lib/utils";
 
 export type GameStatus = "P" | "L" | "W";
 export type GameMetadata = {
@@ -32,21 +34,16 @@ function getGameStatus(status: GameStatus) {
 
 type GameTableProps = {
   handleResumeGame: (gameId: string) => void;
+  handleDeleteGame: (gameId: string) => void;
+  games: Games | undefined;
+  isLoading: boolean;
+  error: Error | null;
 };
 export function GameTable(props: GameTableProps) {
-  const [games, setGames] = useState<Games>([]);
+  if (props.isLoading || props.games === undefined)
+    return <>Loading games...</>;
 
-  // TODO Add useQuery
-  useEffect(() => {
-    const getGames = async () => {
-      // TODO add to env variable  or constant
-      const response = await fetch("http://127.0.0.1:8000/minesweeper/");
-      const json = await response.json();
-      setGames(json.data);
-    };
-
-    getGames();
-  }, []);
+  if (props.error) return <>Error occurred: {props.error.message}</>;
 
   const table = (
     <Table>
@@ -56,10 +53,11 @@ export function GameTable(props: GameTableProps) {
           <TableHead className="w-[100px]">Game</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="text-right"></TableHead>
+          <TableHead></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {games.map((game) => {
+        {props.games.map((game) => {
           return (
             <TableRow key={game.id}>
               <TableCell className="font-medium">{game.id}</TableCell>
@@ -67,6 +65,11 @@ export function GameTable(props: GameTableProps) {
               <TableCell className="text-right">
                 <Button onClick={() => props.handleResumeGame(game.id)}>
                   Resume
+                </Button>
+              </TableCell>
+              <TableCell>
+                <Button onClick={() => props.handleDeleteGame(game.id)}>
+                  Delete
                 </Button>
               </TableCell>
             </TableRow>
@@ -82,6 +85,24 @@ export function GameTable(props: GameTableProps) {
 function App() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { data, isPending, error } = useQuery<{ data: Games }>({
+    queryKey: ["games"],
+    queryFn: () => fetch(Env.get("VITE_BACKEND_URL")).then((res) => res.json()),
+  });
+
+  const mutation = useMutation({
+    mutationFn: (gameId: string) => {
+      return fetch(Env.get("VITE_BACKEND_URL") + gameId, {
+        method: "DELETE",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["games"] });
+    },
+  });
+
   const handleResumeGame = (gameId: string) => {
     navigate(`/${gameId}`);
   };
@@ -101,8 +122,12 @@ function App() {
     }
   };
 
+  const handleDeleteGameClick = async (gameId: string) => {
+    mutation.mutate(gameId);
+  };
+
   return (
-    <div className="h-screen flex flex-col gap-4 items-center justify-center">
+    <div className="flex flex-col gap-4 items-center justify-center">
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
         MINESWEEPER
       </h1>
@@ -111,7 +136,13 @@ function App() {
       ) : (
         <Button onClick={handleNewGameClick}>New Game</Button>
       )}
-      <GameTable handleResumeGame={handleResumeGame} />
+      <GameTable
+        handleResumeGame={handleResumeGame}
+        handleDeleteGame={handleDeleteGameClick}
+        games={data?.data}
+        isLoading={isPending}
+        error={error}
+      />
     </div>
   );
 }
