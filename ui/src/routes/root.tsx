@@ -80,17 +80,25 @@ export function GameTable(props: GameTableProps) {
 }
 
 function App() {
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const handleResumeGame = (gameId: string) => {
-    console.log(gameId);
     navigate(`/${gameId}`);
   };
   const handleNewGameClick = async () => {
-    const response = await fetch("http://127.0.0.1:8000/minesweeper/", {
-      method: "POST",
-    });
-    const json = await response.json();
-    console.log(json["grid_id"]);
+    try {
+      setLoading(true);
+
+      const response = await fetch("http://127.0.0.1:8000/minesweeper/", {
+        method: "POST",
+      });
+      const json = await response.json();
+      navigate(`/${json["grid_id"]}`);
+    } catch (err) {
+      console.error("Whomp whomp what happened");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -98,7 +106,11 @@ function App() {
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
         MINESWEEPER
       </h1>
-      <Button onClick={handleNewGameClick}>New Game</Button>
+      {loading ? (
+        <h1>...</h1>
+      ) : (
+        <Button onClick={handleNewGameClick}>New Game</Button>
+      )}
       <GameTable handleResumeGame={handleResumeGame} />
     </div>
   );

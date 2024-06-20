@@ -22,27 +22,26 @@ def create_grid(size: int=8):
     generate_cells(new_grid.id, size)
     return new_grid.id
 
-def update_grid(grid_id: str, row: int, col: int)->GameData:
+def update_grid(grid_id: str, row: int, column: int)->GameData:
     # get cell
-    cell = get_object_or_404(Cell, id=grid_id, row=row, col=col)
+    grid = get_object_or_404(Grid, id=grid_id)
+    cell = get_object_or_404(Cell, grid=grid, row=row, column=column)
     cell.isRevealed = True
     cell.save()
     if cell.isMine:
-        grid = get_object_or_404(Grid, id=grid_id)
         grid.status = 'L'
         grid.save()
         return get_grid(grid_id)
     
-    reveal_and_validate_cells(grid_id, row, col)
+    reveal_and_validate_cells(grid_id, row, column)
 
     return get_grid(grid_id)
 
-def reveal_and_validate_cells(grid_id: str, row: int, col: int):
+def reveal_and_validate_cells(grid_id: str, row: int, column: int):
     grid = get_object_or_404(Grid, id=grid_id)
     size = grid.size
 
     game_map = [[None] * size for _ in range(size)]
-    print(game_map)
     cells = Cell.objects.filter(grid=grid)
 
     for cell in cells:
@@ -61,15 +60,15 @@ def reveal_and_validate_cells(grid_id: str, row: int, col: int):
                     return
 
                 # Track updated cells
-                updated_cells.append({ 'row': offset_x, 'col': offset_y, 'value': cell['value'], 'isMine': cell['isMine'], 'isRevealed': cell['isRevealed']})
+                updated_cells.append({ 'row': offset_x, 'col': offset_y, 'value': cell['value'], 'isMine': cell['isMine'], 'isRevealed': True})
 
                 game_map[offset_x][offset_y]['isRevealed'] = True
                 if cell['value'] == 0:
                     bfs(offset_x, offset_y)
-                return
+        return
             
     
-    bfs(row, col)
+    bfs(row, column)
 
     # TODO reevaluate performance
     # Reveal updated cells. 
@@ -95,13 +94,17 @@ def reveal_and_validate_cells(grid_id: str, row: int, col: int):
     
 
 
-# TODO only share values of revealed 
 def get_grid(grid_id: str)->GameData:
     grid = get_object_or_404(Grid, id=grid_id)
     cells = Cell.objects.filter(grid=grid_id)
 
-    grid_data = model_to_dict(grid)
-    cells_data = [model_to_dict(cell) for cell in cells]
+    grid_data = { "id": grid.id, "size": grid.size, "status": grid.status }
+    cells_data = []
+    for cell in cells:
+        if cell.isRevealed:
+            cells_data.append({ "row": cell.row, "column": cell.column, "isRevealed": cell.isRevealed, "isMine": cell.isMine, "id": str(cell.grid.id), "value": cell.value  })
+        else:
+            cells_data.append({ "row": cell.row, "column": cell.column })
 
     return {"data": { "grid": grid_data, "cells": cells_data}}
 

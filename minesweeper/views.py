@@ -1,8 +1,9 @@
+import json
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 
 from .models import Grid, Cell
-from .services import get_grids, create_grid, get_grid
+from .services import get_grids, create_grid, get_grid, update_grid
 
 from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
@@ -30,7 +31,12 @@ def index(request):
 def grid(request, grid_id):
     if request.method == 'PUT':
         # handle updating game
-        return HttpResponseBadRequest('Unsupported operation')
+        try:
+            data = json.loads(request.body)  # Parse JSON request body
+            updated_grid = update_grid(data['grid_id'], data['row'], data['column'])
+            return JsonResponse(updated_grid)
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest('Invalid JSON')
     elif request.method == 'GET':
         grid = get_grid(grid_id)
         return JsonResponse(grid)
