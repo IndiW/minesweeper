@@ -27,18 +27,21 @@ python manage.py runserver
 
 ## To do
 
-- add react frontend
 - add docker (optional)
-- add venv (optional)
 - add linting
 - add prettier
 
-- add routes
-- add models
-- add services
-- update routes
+- backend performance optimization
+- ajax request support
+
 - unit tests
 
-- frontend framework
 - frontend styling
 - unit tests
+- frontend component clean up
+- accessibility support
+- victory screen
+- share functionality
+- mobile support
+- loading indicators
+-

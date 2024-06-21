@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { GameMetadata } from "./root";
+import { GameMetadata } from "@/components/game_table";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import Realistic from "react-canvas-confetti/dist/presets/realistic";
 
 type Cell = {
   row: number;
@@ -83,6 +84,14 @@ export default function MinesweeperGame() {
 
   return (
     <div className="h-screen flex flex-col gap-4 items-center justify-center">
+      <div>
+        {gameMetadata?.status === "W" ? (
+          <Realistic autorun={{ speed: 10, duration: 10 }} />
+        ) : (
+          <></>
+        )}
+      </div>
+
       <h1>Don't explode</h1>
       {cells.length !== 0 && gameMetadata !== undefined ? (
         <div className={`grid grid-cols-${gameMetadata?.size}`}>
