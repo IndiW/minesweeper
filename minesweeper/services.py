@@ -26,6 +26,7 @@ def update_grid(grid_id: str, row: int, column: int)->GameData:
     # get cell
     grid = get_object_or_404(Grid, id=grid_id)
     cell = get_object_or_404(Cell, grid=grid, row=row, column=column)
+
     cell.isRevealed = True
     cell.save()
     if cell.isMine:
@@ -78,17 +79,22 @@ def reveal_and_validate_cells(grid_id: str, row: int, column: int):
             c.save()
     
 
+    # TODO validate based on all squares that aren't mines are revealed.
+    # count all revealed, check if revealed = total - totalMines
     # Validate game
     mine_count = 0
     hidden_count = 0
+    revealedMine = False
     for row in range(len(game_map)):
-        for col in range(row):
+        for col in range(len(game_map[0])):
             if game_map[row][col]['isMine']:
                 mine_count += 1
+            if game_map[row][col]['isMine'] and game_map[row][col]['isRevealed']:
+                revealedMine = True
             if not game_map[row][col]['isRevealed']:
                 hidden_count += 1
     
-    if mine_count == hidden_count:
+    if mine_count == hidden_count and not revealedMine:
         grid.status = "W"
         grid.save()
     
@@ -106,16 +112,15 @@ def get_grid(grid_id: str)->GameData:
         else:
             cells_data.append({ "row": cell.row, "column": cell.column })
 
-    return {"data": { "grid": grid_data, "cells": cells_data}}
+    return {"data":{"grid": grid_data,"cells":cells_data}}
 
 
+# TODO pass value to configure randint to generate same set of values for a given day
 def generate_cells(grid_id: str, size: int, totalMines: int=10)->None:
     grid = get_object_or_404(Grid, id=grid_id)
     if totalMines >= size*size:
         raise HttpResponseBadRequest('Invalid game settings')
     game_map = [[0] * size for _ in range(size)]
-    print(game_map)
-
 
     # randomly place mines    
     def get_random_coordinates():
@@ -126,6 +131,7 @@ def generate_cells(grid_id: str, size: int, totalMines: int=10)->None:
     random_coords = get_random_coordinates()
     mine_locations = set()
     for _ in range(totalMines):
+        # avoid mine collisions
         while random_coords in mine_locations:
             random_coords = get_random_coordinates()
         
@@ -142,6 +148,7 @@ def generate_cells(grid_id: str, size: int, totalMines: int=10)->None:
 
     
 
+    # create Cell records
     for row in range(size):
         for col in range(size):
             isMine = (row,col) in mine_locations

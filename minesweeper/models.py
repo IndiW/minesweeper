@@ -6,6 +6,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 class Grid(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     size = models.PositiveSmallIntegerField()
+    # totalMines = models.PositiveSmallIntegerField()
     status = models.CharField(max_length=1, default="P", choices=[
         ("W", "Win"),
         ("L", "Loss"),
@@ -22,6 +23,7 @@ class Cell(models.Model):
     )
     isMine = models.BooleanField()
     isRevealed = models.BooleanField()
+    # isFlagged = models.BooleanField(default=False)
 
     class Meta:
         constraints = [

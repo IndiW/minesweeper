@@ -45,3 +45,7 @@ python manage.py runserver
 - mobile support
 - loading indicators
 -
+
+- "no guess" game variation
+- store flags in backend
+- update color palette to fellow

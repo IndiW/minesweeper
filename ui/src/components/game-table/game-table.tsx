@@ -9,15 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Trash } from "lucide-react";
-
-export type GameStatus = "P" | "L" | "W";
-export type GameMetadata = {
-  id: string;
-  size: number;
-  status: GameStatus;
-};
-
-export type Games = Array<GameMetadata>;
+import { GameStatus, Games } from "@/client/types";
 
 function getGameStatus(status: GameStatus) {
   const statusMap: Record<GameStatus, "Win" | "Loss" | "In Progress"> = {

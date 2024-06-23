@@ -17,6 +17,11 @@ def index(request):
     #     return HttpResponseBadRequest('Invalid Request')
 
     if request.method == 'POST':
+        data = json.loads(request.body)
+        if data['grid_size']:
+            new_grid = create_grid(data['grid_size'])
+            return JsonResponse({"grid_id": new_grid})
+        
         new_grid = create_grid(8)
         return JsonResponse({"grid_id": new_grid})
 
