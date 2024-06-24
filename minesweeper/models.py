@@ -4,14 +4,19 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Create your models here.
 class Grid(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(primary_key=True, max_length=36, unique=True, editable=False)
     size = models.PositiveSmallIntegerField()
-    # totalMines = models.PositiveSmallIntegerField()
+    total_mines = models.PositiveSmallIntegerField(default=10)
     status = models.CharField(max_length=1, default="P", choices=[
         ("W", "Win"),
         ("L", "Loss"),
         ("P", "In Progress")
     ])
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.id = str(uuid.uuid4())  # Assign a UUID if id is not set
+        super().save(*args, **kwargs)
 
 class Cell(models.Model):
     grid = models.ForeignKey(Grid, on_delete=models.CASCADE)
@@ -21,9 +26,9 @@ class Cell(models.Model):
         default=0,
         validators=[MaxValueValidator(8), MinValueValidator(0)]
     )
-    isMine = models.BooleanField()
-    isRevealed = models.BooleanField()
-    # isFlagged = models.BooleanField(default=False)
+    is_mine = models.BooleanField()
+    is_revealed = models.BooleanField()
+    is_flagged = models.BooleanField(default=False)
 
     class Meta:
         constraints = [

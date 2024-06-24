@@ -1,6 +1,8 @@
 # Minesweeper
 
-## Setup
+## Local Development Setup
+
+### Backend
 
 Setup venv
 
@@ -19,10 +21,32 @@ pip list --local
 
 ```
 
+Install packages
+
+```
+pip install -r ./requirements.txt
+```
+
 Run server
 
 ```
 python manage.py runserver
+```
+
+### Frontend
+
+From the `ui` directory, run the following:
+
+Install packages
+
+```
+yarn
+```
+
+Run app locally
+
+```
+yarn dev
 ```
 
 ## To do
@@ -36,16 +60,16 @@ python manage.py runserver
 
 - unit tests
 
-- frontend styling
 - unit tests
-- frontend component clean up
 - accessibility support
 - victory screen
-- share functionality
-- mobile support
+
 - loading indicators
--
 
 - "no guess" game variation
 - store flags in backend
 - update color palette to fellow
+
+- fix double GET on game-page
+
+- fix failed create daily on first try

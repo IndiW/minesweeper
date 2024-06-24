@@ -3,6 +3,7 @@ export type GameMetadata = {
   id: string;
   size: number;
   status: GameStatus;
+  total_mines: number;
 };
 
 export type Games = Array<GameMetadata>;
@@ -11,10 +12,11 @@ export type Cell = {
   row: number;
   column: number;
   value?: number;
-  isRevealed?: boolean;
-  isMine?: boolean;
+  is_revealed?: boolean;
+  is_mine?: boolean;
   grid?: string;
   id?: number;
+  is_flagged?: boolean;
 };
 
 export type Cells = Array<Cell>;

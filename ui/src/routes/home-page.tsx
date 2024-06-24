@@ -1,43 +1,30 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
 import { MinesweeperClient } from "@/client/MinesweeperClient";
+import { BombLoading } from "@/components/bomb-loading";
 
+const getDateInYYYYMMDD = () => {
+  const yourDate = new Date();
+  const dateString = yourDate.toISOString().split("T")[0];
+  return dateString;
+};
 export default function HomePage() {
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleNewGameClick = async () => {
-    try {
-      setLoading(true);
+  useEffect(() => {
+    const createDailyGame = async () => {
       const client = new MinesweeperClient();
-      const data = await client.createNewGame();
-      navigate(`/${data.grid_id}`);
-    } catch (err) {
-      console.error("Whomp whomp what happened");
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const data = await client.getGame(`daily-${getDateInYYYYMMDD()}`);
+        navigate("/" + data.data.grid.id);
+      } catch (err) {
+        const response = await client.createDailyGame();
+        navigate("/" + response.grid_id);
+      }
+    };
 
-  const newGameButton = (
-    <Button onClick={handleNewGameClick} disabled={loading}>
-      {loading ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Placing bombs
-        </>
-      ) : (
-        "New Game"
-      )}
-    </Button>
-  );
+    createDailyGame();
+  }, [navigate]);
 
-  return (
-    <div>
-      {newGameButton}
-      <Button onClick={() => navigate("/games")}>Game History</Button>
-    </div>
-  );
+  return <BombLoading />;
 }

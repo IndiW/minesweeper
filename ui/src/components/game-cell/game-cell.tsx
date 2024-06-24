@@ -1,4 +1,4 @@
-import { Flag } from "lucide-react";
+import { Bomb, Flag } from "lucide-react";
 import { Button } from "../ui/button";
 
 type GameCellProps = {
@@ -7,13 +7,31 @@ type GameCellProps = {
   isMine: boolean;
   onLeftClick: () => void;
   onRightClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  value: string | JSX.Element | undefined;
+  value: string | number | JSX.Element | undefined;
   gridColumn: number;
   gridRow: number;
 };
 
 // TODO handle mobile click scenario
 export function GameCell(props: GameCellProps): JSX.Element {
+  const getCellValue = () => {
+    if (props.isMine) {
+      return <Bomb className="h-4 w-4" />;
+    } else if (props.isFlagged) {
+      return (
+        <Flag
+          color="red"
+          fill="red"
+          className="h-4 w-4 md:w-6 md:h-6 lg:w-8 lg:h-8"
+        />
+      );
+    } else if (props.value !== undefined) {
+      return <>{props.value.toString()}</>;
+    } else {
+      return <></>;
+    }
+  };
+
   return (
     <Button
       disabled={props.isDisabled}
@@ -27,15 +45,7 @@ export function GameCell(props: GameCellProps): JSX.Element {
       onContextMenu={props.onRightClick}
       size={"icon"}
     >
-      {props.isFlagged ? (
-        <Flag
-          color="red"
-          fill="red"
-          className="h-4 w-4 md:w-6 md:h-6 lg:w-8 lg:h-8"
-        />
-      ) : (
-        props.value
-      )}
+      {getCellValue()}
     </Button>
   );
 }

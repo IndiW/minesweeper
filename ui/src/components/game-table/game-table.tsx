@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Trash } from "lucide-react";
 import { GameStatus, Games } from "@/client/types";
+import { Link } from "react-router-dom";
 
 function getGameStatus(status: GameStatus) {
   const statusMap: Record<GameStatus, "Win" | "Loss" | "In Progress"> = {
@@ -49,12 +50,12 @@ export function GameTable(props: GameTableProps) {
           return (
             <TableRow key={game.id}>
               <TableCell className="font-medium">
-                <a
-                  href={`/${game.id}`}
+                <Link
+                  to={`/${game.id}`}
                   className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                 >
                   {game.id}
-                </a>
+                </Link>
               </TableCell>
               <TableCell>{getGameStatus(game.status)}</TableCell>
               <TableCell>

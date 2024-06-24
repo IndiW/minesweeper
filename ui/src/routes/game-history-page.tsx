@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Env } from "@/lib/utils";
 import { GameTable } from "@/components/game-table";
 
 import { MinesweeperClient } from "@/client/MinesweeperClient";
@@ -15,9 +14,7 @@ export function GameHistoryPage(): JSX.Element {
 
   const mutation = useMutation({
     mutationFn: (gameId: string) => {
-      return fetch(Env.get("VITE_BACKEND_URL") + gameId, {
-        method: "DELETE",
-      });
+      return client.deleteGame(gameId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["games"] });

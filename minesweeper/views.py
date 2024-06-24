@@ -1,16 +1,16 @@
 import json
-from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 
-from .models import Grid, Cell
-from .services import get_grids, create_grid, get_grid, update_grid
+from .models import Grid
+from .services import get_grids, GameGenerator, GameManager
 
 from django.views.decorators.csrf import csrf_exempt
-# Create your views here.
 
 # TODO Add CSRF Support
+# TODO add validation
 @csrf_exempt
-def index(request):
+def games(request):
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
     # if not is_ajax:
@@ -18,12 +18,19 @@ def index(request):
 
     if request.method == 'POST':
         data = json.loads(request.body)
-        if data['grid_size']:
-            new_grid = create_grid(data['grid_size'])
-            return JsonResponse({"grid_id": new_grid})
+        if 'daily' in data and data['daily']:
+            game_generator = GameGenerator(is_daily=data['daily'])
+            game_id = game_generator.generate_game()
+            return JsonResponse({"grid_id": game_id})
         
-        new_grid = create_grid(8)
-        return JsonResponse({"grid_id": new_grid})
+        if 'grid_size' in data:
+            game_generator = GameGenerator()
+            game_id = game_generator.generate_game()
+            return JsonResponse({"grid_id": game_id})
+
+        game_generator = GameGenerator()
+        game_id = game_generator.generate_game()
+        return JsonResponse({"grid_id": game_id})
 
     elif request.method == 'GET':
         grids = get_grids()
@@ -31,24 +38,45 @@ def index(request):
 
     return HttpResponseBadRequest('Invalid Request')
 
+@csrf_exempt
+def get_game(request, grid_id):
+    game_manager = GameManager(game_id=grid_id)
+    if request.method == 'GET':
+        grid = game_manager.get_game()
+        return JsonResponse(grid)
+    elif request.method == 'DELETE':
+        game_manager.delete_game()
+        return JsonResponse({'message': 'Game deleted successfully'}, status=204)
+    
+    return HttpResponseBadRequest('Unsupported Operation')
 
 @csrf_exempt
-def grid(request, grid_id):
-    if request.method == 'PUT':
-        # handle updating game
-        try:
-            data = json.loads(request.body)  # Parse JSON request body
-            updated_grid = update_grid(data['grid_id'], data['row'], data['column'])
-            return JsonResponse(updated_grid)
-        except json.JSONDecodeError:
-            return HttpResponseBadRequest('Invalid JSON')
-    elif request.method == 'GET':
-        grid = get_grid(grid_id)
+def lose_game(request, grid_id):
+    if request.method == 'POST':
+        game_manager = GameManager(game_id=grid_id)
+        game_manager.lose_game()
+        grid = game_manager.get_game()
         return JsonResponse(grid)
+    return HttpResponseBadRequest('Unsupported Operation')    
 
-    elif request.method == 'DELETE':
-        obj = get_object_or_404(Grid, id=grid_id)
-        obj.delete()
-        return JsonResponse({'message': 'Grid deleted successfully'}, status=204)
+@csrf_exempt
+def set_flag(request, grid_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        game_manager = GameManager(game_id=grid_id)
+        game_manager.set_flag(row=data['row'], column=data['column'])
+        grid = game_manager.get_game()
+        return JsonResponse(grid)
+    return HttpResponseBadRequest('Unsupported Operation')
 
-    return HttpResponseBadRequest('Invalid Request')
+
+
+@csrf_exempt
+def reveal_cell(request, grid_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        game_manager = GameManager(game_id=grid_id)
+        game_manager.reveal_cell(row=data['row'], column=data['column'])
+        grid = game_manager.get_game()
+        return JsonResponse(grid)
+    return HttpResponseBadRequest('Unsupported Operation')
