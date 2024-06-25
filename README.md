@@ -1,4 +1,10 @@
-# Minesweeper
+# :bomb: Sweeper
+
+The classic minesweeper game brought to you in React and Django. In this first edition, when the time runs out the bombs will explode -> so be quick!
+
+Frontend: React, ShadCDN, Tailwind
+
+Backend: Django, SQLLite
 
 ## Local Development Setup
 
@@ -6,7 +12,7 @@
 
 Setup venv
 
-```
+```ts
 // install virtualenv
 pip install virtualenv
 
@@ -51,23 +57,16 @@ yarn dev
 
 ## To do
 
-- add docker (optional)
+Technical
+
+- add unit testing (FE and BE)
 - add linting
 - add prettier
+- production build
+- save timer state between games / renders
 
-- backend performance optimization
-- ajax request support
+Features
 
-- unit tests
-
-- unit tests
-- accessibility support
-- victory screen
-
+- 'How to play' page
 - "no guess" game variation
-- store flags in backend
-- update color palette to fellow
-
-- fix double GET on game-page
-
-- fix failed create daily on first try
+- customization (bomb count, grid size, time etc)
