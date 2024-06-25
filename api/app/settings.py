@@ -29,35 +29,45 @@ DEBUG = True
 CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',  # React App
-    'http://127.0.0.1:8000',   # Allow Django development server
+    'http://localhost:5173', 
+    'http://localhost:8000', 
+    'http://localhost:8080', 
+    'http://127.0.0.1:8000',  
+    'http://172.18.0.3:8080',
 ]
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '*',
+    'http://localhost:5173', 
+    'http://localhost:8000', 
+    'http://localhost:8080', 
+    'http://127.0.0.1:8000',  
+    'http://172.18.0.3:8080',
+]
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'minesweeper.apps.MinesweeperConfig',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+        'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'
