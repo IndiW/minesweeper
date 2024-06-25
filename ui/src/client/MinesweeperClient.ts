@@ -18,6 +18,11 @@ export class MinesweeperClient {
       body: JSON.stringify({
         grid_size: gridSize,
       }),
+      headers: {
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        // 'X-CSRFToken': csrftoken,
+      },
     });
     const json = await response.json();
     return json as CreateGameResponse;
@@ -29,19 +34,36 @@ export class MinesweeperClient {
       body: JSON.stringify({
         daily: true,
       }),
+      headers: {
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        // 'X-CSRFToken': csrftoken,
+      },
     });
     const json = await response.json();
     return json as CreateGameResponse;
   }
 
   async getAllGames(): Promise<GetAllGamesResponse> {
-    const response = await fetch(this.backendUrl);
+    const response = await fetch(this.backendUrl, {
+      headers: {
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        // 'X-CSRFToken': csrftoken,
+      },
+    });
     const json = await response.json();
     return json as GetAllGamesResponse;
   }
 
   async getGame(gameId: string): Promise<GetGameResponse> {
-    const response = await fetch(`${this.backendUrl}/${gameId}`);
+    const response = await fetch(`${this.backendUrl}/${gameId}`, {
+      headers: {
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        // 'X-CSRFToken': csrftoken,
+      },
+    });
     const json = await response.json();
     return json as GetGameResponse;
   }
@@ -49,6 +71,11 @@ export class MinesweeperClient {
   async loseGame(gameId: string): Promise<GetGameResponse> {
     const response = await fetch(`${this.backendUrl}/${gameId}/lose`, {
       method: "POST",
+      headers: {
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        // 'X-CSRFToken': csrftoken,
+      },
     });
     const json = await response.json();
     return json as GetGameResponse;
@@ -66,6 +93,11 @@ export class MinesweeperClient {
         row: row,
         column: column,
       }),
+      headers: {
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        // 'X-CSRFToken': csrftoken,
+      },
     });
     const json = await response.json();
     return json as GetGameResponse;
@@ -83,6 +115,11 @@ export class MinesweeperClient {
         row: row,
         column: column,
       }),
+      headers: {
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        // 'X-CSRFToken': csrftoken,
+      },
     });
     const json = await response.json();
     return json as GetGameResponse;
@@ -91,6 +128,11 @@ export class MinesweeperClient {
   async deleteGame(gameId: string) {
     await fetch(`${this.backendUrl}/${gameId}`, {
       method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        // 'X-CSRFToken': csrftoken,
+      },
     });
   }
 }

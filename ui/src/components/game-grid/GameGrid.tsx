@@ -35,12 +35,12 @@ export function GameGrid(props: GameGridProps): JSX.Element {
                   autorun={{ speed: 30, duration: 30 }}
                   decorateOptions={() => {
                     return {
-                      particleCount: 50,
-                      spread: 200,
+                      particleCount: 30,
+                      spread: 100,
                       ticks: 60,
                       colors: ["#ff0000"],
                       shapes: ["circle"],
-                      gravity: 0.6,
+                      gravity: 0.3,
                     };
                   }}
                 />

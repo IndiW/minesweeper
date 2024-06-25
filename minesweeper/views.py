@@ -13,8 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 def games(request):
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
-    # if not is_ajax:
-    #     return HttpResponseBadRequest('Invalid Request')
+    if not is_ajax:
+        return HttpResponseBadRequest('Invalid Request')
 
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -40,6 +40,10 @@ def games(request):
 
 @csrf_exempt
 def get_game(request, grid_id):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if not is_ajax:
+        return HttpResponseBadRequest('Invalid Request')
+
     game_manager = GameManager(game_id=grid_id)
     if request.method == 'GET':
         grid = game_manager.get_game()
@@ -52,6 +56,10 @@ def get_game(request, grid_id):
 
 @csrf_exempt
 def lose_game(request, grid_id):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if not is_ajax:
+        return HttpResponseBadRequest('Invalid Request')
+    
     if request.method == 'POST':
         game_manager = GameManager(game_id=grid_id)
         game_manager.lose_game()
@@ -61,6 +69,10 @@ def lose_game(request, grid_id):
 
 @csrf_exempt
 def set_flag(request, grid_id):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if not is_ajax:
+        return HttpResponseBadRequest('Invalid Request')
+    
     if request.method == 'POST':
         data = json.loads(request.body)
         game_manager = GameManager(game_id=grid_id)
@@ -73,6 +85,10 @@ def set_flag(request, grid_id):
 
 @csrf_exempt
 def reveal_cell(request, grid_id):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if not is_ajax:
+        return HttpResponseBadRequest('Invalid Request')
+    
     if request.method == 'POST':
         data = json.loads(request.body)
         game_manager = GameManager(game_id=grid_id)

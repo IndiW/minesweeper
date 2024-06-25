@@ -64,8 +64,6 @@ yarn dev
 - accessibility support
 - victory screen
 
-- loading indicators
-
 - "no guess" game variation
 - store flags in backend
 - update color palette to fellow

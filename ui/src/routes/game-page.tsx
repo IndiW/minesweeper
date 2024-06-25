@@ -17,7 +17,6 @@ export default function MinesweeperGame() {
   const [cells, setCells] = useState<Cells>([]);
   const [disableGame, setDisableGame] = useState(false);
   const [flagCount, setFlagCount] = useState<number>(0);
-  const [timerTime, setTimerTime] = useState<Date>(new Date());
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["game", gameId],
@@ -39,18 +38,6 @@ export default function MinesweeperGame() {
           data.cells.filter((cell) => cell.is_flagged).length
       );
       setDisableGame(["L", "W"].includes(data.grid.status));
-
-      if (data.grid.status !== "P") {
-        setTimerTime((t) => {
-          t.setSeconds(0);
-          return t;
-        });
-      } else {
-        setTimerTime((t) => {
-          t.setSeconds(t.getSeconds() + 60);
-          return t;
-        });
-      }
     }
   }, [data]);
 
@@ -126,14 +113,20 @@ export default function MinesweeperGame() {
   if (gameMetadata === undefined || gameId === undefined)
     return <BombLoading />;
 
+  const handleOnTimeExpiry = () => {
+    if (gameMetadata.status === "P") {
+      loseGameMutation.mutate({ gameId });
+    }
+  };
+
   return (
     <div className="flex flex-col gap-2 relative">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <CompletionText type={gameMetadata.status} />
       </div>
       <GameStatusBar
-        time={timerTime}
-        onTimeExpiry={() => loseGameMutation.mutate({ gameId })}
+        key={gameId + "-timer"}
+        onTimeExpiry={handleOnTimeExpiry}
         flagCount={flagCount}
         gameStatus={gameMetadata.status}
       />
